@@ -13,6 +13,9 @@ import {z} from 'genkit';
 
 const GenderEnum = z.enum(['male', 'female']);
 
+export type GenerateIslamicNameFromFaceInput = z.infer<
+  typeof GenerateIslamicNameFromFaceInputSchema
+>;
 const GenerateIslamicNameFromFaceInputSchema = z.object({
   photoDataUri: z
     .string()
@@ -21,18 +24,16 @@ const GenerateIslamicNameFromFaceInputSchema = z.object({
     ),
   gender: GenderEnum.describe('The gender of the baby.'),
 });
-export type GenerateIslamicNameFromFaceInput = z.infer<
-  typeof GenerateIslamicNameFromFaceInputSchema
->;
 
+
+export type GenerateIslamicNameFromFaceOutput = z.infer<
+  typeof GenerateIslamicNameFromFaceOutputSchema
+>;
 const GenerateIslamicNameFromFaceOutputSchema = z.object({
   names: z
     .array(z.string())
     .describe('A list of suggested Islamic names based on facial features.'),
 });
-export type GenerateIslamicNameFromFaceOutput = z.infer<
-  typeof GenerateIslamicNameFromFaceOutputSchema
->;
 
 export async function generateIslamicNameFromFace(
   input: GenerateIslamicNameFromFaceInput
@@ -44,17 +45,12 @@ const prompt = ai.definePrompt({
   name: 'generateIslamicNameFromFacePrompt',
   input: {schema: GenerateIslamicNameFromFaceInputSchema},
   output: {schema: GenerateIslamicNameFromFaceOutputSchema},
-  prompt: `You are an expert in suggesting Islamic names for newborns based on their facial features.
+  prompt: `You are an expert in Islamic names. Based on the photo of the baby provided, suggest a list of 5 Islamic names that feel suitable for them.
 
-  Given the photo of the baby and their gender, suggest a list of appropriate Islamic names.
-  Consider the cultural appropriateness and the meanings of the names.
+Gender: {{{gender}}}
+Photo: {{media url=photoDataUri}}
 
-  Gender: {{{gender}}}
-  Photo: {{media url=photoDataUri}}
-
-  Return a list of names that would be suitable for the baby.
-  Return only the array of names.
-  `,
+Return a JSON object with a 'names' array containing your suggestions.`,
 });
 
 const generateIslamicNameFromFaceFlow = ai.defineFlow(

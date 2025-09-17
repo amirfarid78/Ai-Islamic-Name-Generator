@@ -25,7 +25,7 @@ export async function getAiSuggestions(
         });
 
         if (!nameSuggestions.names || nameSuggestions.names.length === 0) {
-            console.log("AI did not return any name suggestions.");
+            console.log("AI did not return any name suggestions from face analysis.");
             return [];
         }
 
@@ -37,10 +37,12 @@ export async function getAiSuggestions(
     } catch (error) {
         console.error("Error in getAiSuggestions server action:", error);
         if (error instanceof z.ZodError) {
+            // This case is unlikely to be hit with client-side checks, but good for robustness
             throw new Error(`Invalid input: ${error.errors.map(e => e.message).join(', ')}`);
         }
-        // Re-throw other errors to be caught by the client
-        throw new Error("An unexpected error occurred while generating names.");
+        // Instead of re-throwing, which crashes the client, we'll return an empty array.
+        // The error is logged on the server for debugging.
+        return [];
     }
 }
 
@@ -55,6 +57,7 @@ export async function getChatResponse(fatherName: string, gender: 'male' | 'fema
         });
 
         if (!suggestions.names || suggestions.names.length === 0) {
+            console.log("Chat agent did not return any name suggestions.");
             return [];
         }
 
@@ -65,8 +68,9 @@ export async function getChatResponse(fatherName: string, gender: 'male' | 'fema
     } catch (error) {
         console.error("Error in getChatResponse server action:", error);
         if (error instanceof z.ZodError) {
-            throw new Error(`Invalid input: ${error.errors.map(e => e.message).join(', ')}`);
+             throw new Error(`Invalid input: ${error.errors.map(e => e.message).join(', ')}`);
         }
-        throw new Error("An unexpected error occurred during the chat.");
+        // Return empty array on failure to prevent client crash
+        return [];
     }
 }

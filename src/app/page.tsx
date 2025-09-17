@@ -135,11 +135,11 @@ export default function Home() {
 
     try {
         const result = await getAiSuggestions(imageDataUrl, gender);
-        if(result.length > 0) {
+        if(result && result.length > 0) {
           setSuggestions(result);
           setStep("results");
         } else {
-          setError("We couldn't generate any names. Please try again with a clearer picture.");
+          setError("We couldn't generate any names from this photo. Please try again with a different or clearer picture.");
           setStep("error");
         }
     } catch (err) {
@@ -150,7 +150,7 @@ export default function Home() {
         toast({
             variant: "destructive",
             title: "Generation Failed",
-            description: "There was an issue generating names. Please try again.",
+            description: "An unexpected error occurred. Please try again.",
         });
     }
   };

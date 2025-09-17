@@ -44,7 +44,19 @@ const augmentNameSuggestionsWithMeaningFlow = ai.defineFlow(
     outputSchema: AugmentNameSuggestionsWithMeaningOutputSchema,
   },
   async input => {
+    // If there are no names to augment, return an empty array immediately.
+    if (!input || input.length === 0) {
+      return [];
+    }
+
     const {output} = await augmentNameSuggestionsWithMeaningPrompt(input);
-    return output!;
+    
+    // Safety check: Ensure the output is a valid array.
+    if (!output || !Array.isArray(output)) {
+      console.warn('AI did not return a valid array for augmenting names.');
+      return [];
+    }
+    
+    return output;
   }
 );

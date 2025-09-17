@@ -40,19 +40,18 @@ const prompt = ai.definePrompt({
   name: 'chatWithAgentPrompt',
   input: {schema: ChatWithAgentInputSchema},
   output: {schema: ChatWithAgentOutputSchema},
-  prompt: `You are a helpful and friendly AI agent specializing in Islamic names. A user wants name suggestions for their baby.
+  prompt: `You are an AI specializing in Islamic names. A user wants name suggestions for their baby.
 
-The user has provided the following information:
+The user has provided:
 - Father's Name: {{{fatherName}}}
 - Baby's Gender: {{{gender}}}
 
-Suggest 1 to 3 beautiful and meaningful Islamic names for the baby. The names should be related to, or have a similar good meaning as, the father's name. They could be variations of the father's name, names with a complementary meaning, or names of prophets/righteous figures that have a connection.
+Suggest 1 to 3 beautiful Islamic names for the baby. The names should be related to the father's name (similar meaning, variations, etc.).
 {{#if existingNames}}
-Do not suggest any of the following names that have already been provided:
-{{{JSON.stringify existingNames}}}
+Do not suggest the following names: {{{JSON.stringify existingNames}}}.
 {{/if}}
 
-Your response should only be a JSON object with a 'names' array, containing the new suggestions. If you cannot find any suitable names, return an empty array.`,
+Return a JSON object with a 'names' array. If you have no new suggestions, return an empty array.`,
 });
 
 const chatWithAgentFlow = ai.defineFlow(

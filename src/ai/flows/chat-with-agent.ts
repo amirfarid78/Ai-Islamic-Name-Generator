@@ -13,14 +13,14 @@ import {z} from 'genkit';
 
 const GenderEnum = z.enum(['male', 'female']);
 
-export const ChatWithAgentInputSchema = z.object({
+const ChatWithAgentInputSchema = z.object({
   fatherName: z.string().describe("The father's name."),
   gender: GenderEnum.describe('The gender of the baby.'),
   existingNames: z.array(z.string()).describe('A list of names already suggested to avoid repetition.'),
 });
 export type ChatWithAgentInput = z.infer<typeof ChatWithAgentInputSchema>;
 
-export const ChatWithAgentOutputSchema = z.object({
+const ChatWithAgentOutputSchema = z.object({
   names: z.array(z.string()).describe('A list of 1-3 new suggested Islamic names.'),
 });
 export type ChatWithAgentOutput = z.infer<typeof ChatWithAgentOutputSchema>;

@@ -42,7 +42,7 @@ The user has provided the following information:
 - Baby's Gender: {{{gender}}}
 
 Suggest 1 to 3 beautiful and meaningful Islamic names for the baby. The names should be related to, or have a similar good meaning as, the father's name. They could be variations of the father's name, names with a complementary meaning, or names of prophets/righteous figures that have a connection.
-{{#if existingNames}}
+{{#if existingNames.length}}
 Do not suggest any of the following names that have already been provided:
 {{{JSON.stringify existingNames}}}
 {{/if}}

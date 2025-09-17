@@ -61,6 +61,13 @@ const generateIslamicNameFromFaceFlow = ai.defineFlow(
   },
   async input => {
     const {output} = await prompt(input);
-    return output!;
+
+    // Safety check: Ensure the output and names array exist.
+    if (!output || !Array.isArray(output.names)) {
+      console.warn('AI did not return a valid name list for facial analysis.');
+      return { names: [] };
+    }
+
+    return output;
   }
 );

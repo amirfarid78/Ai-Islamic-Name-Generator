@@ -43,6 +43,7 @@ export async function generateIslamicNameFromFace(
 
 const prompt = ai.definePrompt({
   name: 'generateIslamicNameFromFacePrompt',
+  model: 'googleai/gemini-2.5-flash',
   input: {schema: GenerateIslamicNameFromFaceInputSchema},
   output: {schema: GenerateIslamicNameFromFaceOutputSchema},
   prompt: `You are an expert in Islamic names. Based on the photo of the baby provided, suggest a list of 5 Islamic names that feel suitable for them.

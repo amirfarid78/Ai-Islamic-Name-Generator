@@ -30,6 +30,7 @@ export async function augmentNameSuggestionsWithMeaning(
 
 const augmentNameSuggestionsWithMeaningPrompt = ai.definePrompt({
   name: 'augmentNameSuggestionsWithMeaningPrompt',
+  model: 'googleai/gemini-2.5-flash',
   input: {schema: AugmentNameSuggestionsWithMeaningInputSchema},
   output: {schema: AugmentNameSuggestionsWithMeaningOutputSchema},
   prompt: `For each name in the following list, provide its meaning and origin. Return a JSON array where each object contains the name, meaning, and origin.

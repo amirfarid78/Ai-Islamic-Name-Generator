@@ -38,6 +38,7 @@ export async function chatWithAgent(
 
 const prompt = ai.definePrompt({
   name: 'chatWithAgentPrompt',
+  model: 'googleai/gemini-2.5-flash',
   input: {schema: ChatWithAgentInputSchema},
   output: {schema: ChatWithAgentOutputSchema},
   prompt: `You are an AI specializing in Islamic names. A user wants name suggestions for their baby.

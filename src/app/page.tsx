@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, ChangeEvent } from "react";
 import Image from "next/image";
-import { Camera, RefreshCcw, Sparkles, Wand2, LoaderCircle } from "lucide-react";
+import { Camera, RefreshCcw, Sparkles, Wand2, LoaderCircle, Upload, MessageSquare } from "lucide-react";
 
 import { Header } from "@/components/app/header";
 import { Button } from "@/components/ui/button";
@@ -10,10 +10,13 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { getAiSuggestions, type NameSuggestion } from "./actions";
+import { getAiSuggestions } from "./actions";
+import { Chat } from "@/components/app/chat";
+import type { NameSuggestion } from "./types";
+
 
 type Gender = "male" | "female";
-type Step = "initial" | "scanning" | "captured" | "loading" | "results" | "error";
+type Step = "initial" | "scanning" | "captured" | "loading" | "results" | "error" | "chat";
 
 export default function Home() {
   const [step, setStep] = useState<Step>("initial");
@@ -24,8 +27,38 @@ export default function Home() {
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { toast } = useToast();
+
+  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const dataUrl = e.target?.result as string;
+        // Basic validation for image data URL
+        if (dataUrl.startsWith('data:image/')) {
+            setImageDataUrl(dataUrl);
+            setStep("captured");
+        } else {
+            toast({
+                variant: "destructive",
+                title: "Invalid File",
+                description: "Please upload a valid image file.",
+            });
+        }
+      };
+      reader.onerror = () => {
+        toast({
+            variant: "destructive",
+            title: "File Read Error",
+            description: "Could not read the selected file.",
+        });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const startScan = async () => {
     setStep("scanning");
@@ -129,12 +162,32 @@ export default function Home() {
           <div className="text-center">
             <h2 className="font-headline text-4xl md:text-5xl font-bold text-primary">Find the Perfect Islamic Name</h2>
             <p className="mt-4 max-w-2xl mx-auto text-lg text-foreground/80">
-              Our AI analyzes facial features to suggest beautiful and meaningful names for your newborn.
+              Our AI analyzes facial features or works with our experts to suggest beautiful and meaningful names for your newborn.
             </p>
-            <Button size="lg" className="mt-8" onClick={startScan}>
-              <Camera className="mr-2" />
-              Scan Baby's Face
-            </Button>
+            <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
+                <Button size="lg" onClick={startScan}>
+                    <Camera className="mr-2" />
+                    Scan Baby's Face
+                </Button>
+                <Button size="lg" variant="outline" onClick={() => fileInputRef.current?.click()}>
+                    <Upload className="mr-2" />
+                    Upload a Photo
+                </Button>
+            </div>
+            <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileChange}
+                className="hidden"
+                accept="image/*"
+            />
+            <div className="mt-8 text-center">
+                <p className="text-foreground/60 mb-2">Or, for a different approach...</p>
+                <Button size="lg" onClick={() => setStep('chat')}>
+                    <MessageSquare className="mr-2" />
+                    Chat with an Agent
+                </Button>
+            </div>
           </div>
         );
       case "scanning":
@@ -172,9 +225,13 @@ export default function Home() {
                 />
               )}
               <div className="flex gap-4">
-                <Button variant="outline" onClick={retakePhoto}>
+                 <Button variant="outline" onClick={retakePhoto}>
                   <RefreshCcw className="mr-2" />
-                  Retake Photo
+                  Use Camera
+                </Button>
+                <Button variant="outline" onClick={() => fileInputRef.current?.click()}>
+                  <Upload className="mr-2" />
+                  Change Photo
                 </Button>
               </div>
 
@@ -249,6 +306,8 @@ export default function Home() {
                 </Button>
             </div>
         );
+    case "chat":
+        return <Chat onBack={reset} />;
     }
   };
 

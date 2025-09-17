@@ -2,16 +2,12 @@
 
 import { augmentNameSuggestionsWithMeaning } from "@/ai/flows/augment-name-suggestions-with-meaning";
 import { generateIslamicNameFromFace } from "@/ai/flows/generate-islamic-name-from-face";
+import { chatWithAgent } from "@/ai/flows/chat-with-agent";
 import { z } from "zod";
+import type { NameSuggestion } from "./types";
 
 const genderSchema = z.enum(["male", "female"]);
-const dataUriSchema = z.string().startsWith("data:image/jpeg;base64,");
-
-export type NameSuggestion = {
-    name: string;
-    meaning: string;
-    origin: string;
-};
+const dataUriSchema = z.string().startsWith("data:");
 
 export async function getAiSuggestions(
     photoDataUri: string,
@@ -45,5 +41,32 @@ export async function getAiSuggestions(
         }
         // Re-throw other errors to be caught by the client
         throw new Error("An unexpected error occurred while generating names.");
+    }
+}
+
+export async function getChatResponse(fatherName: string, gender: 'male' | 'female', existingNames: string[]): Promise<NameSuggestion[]> {
+    try {
+        const validatedGender = genderSchema.parse(gender);
+        
+        const suggestions = await chatWithAgent({
+            fatherName,
+            gender: validatedGender,
+            existingNames
+        });
+
+        if (!suggestions.names || suggestions.names.length === 0) {
+            return [];
+        }
+
+        const augmentedNames = await augmentNameSuggestionsWithMeaning(suggestions.names);
+
+        return augmentedNames;
+
+    } catch (error) {
+        console.error("Error in getChatResponse server action:", error);
+        if (error instanceof z.ZodError) {
+            throw new Error(`Invalid input: ${error.errors.map(e => e.message).join(', ')}`);
+        }
+        throw new Error("An unexpected error occurred during the chat.");
     }
 }

@@ -51,7 +51,7 @@ export async function getChatResponse(fatherName: string, gender: 'male' | 'fema
         const suggestions = await chatWithAgent({
             fatherName,
             gender: validatedGender,
-            existingNames
+            existingNames: existingNames.length > 0 ? existingNames : undefined
         });
 
         if (!suggestions.names || suggestions.names.length === 0) {

@@ -16,12 +16,17 @@ const GenderEnum = z.enum(['male', 'female']);
 const ChatWithAgentInputSchema = z.object({
   fatherName: z.string().describe("The father's name."),
   gender: GenderEnum.describe('The gender of the baby.'),
-  existingNames: z.array(z.string()).describe('A list of names already suggested to avoid repetition.'),
+  existingNames: z
+    .array(z.string())
+    .optional()
+    .describe('A list of names already suggested to avoid repetition.'),
 });
 export type ChatWithAgentInput = z.infer<typeof ChatWithAgentInputSchema>;
 
 const ChatWithAgentOutputSchema = z.object({
-  names: z.array(z.string()).describe('A list of 1-3 new suggested Islamic names.'),
+  names: z
+    .array(z.string())
+    .describe('A list of 1-3 new suggested Islamic names.'),
 });
 export type ChatWithAgentOutput = z.infer<typeof ChatWithAgentOutputSchema>;
 
@@ -42,7 +47,7 @@ The user has provided the following information:
 - Baby's Gender: {{{gender}}}
 
 Suggest 1 to 3 beautiful and meaningful Islamic names for the baby. The names should be related to, or have a similar good meaning as, the father's name. They could be variations of the father's name, names with a complementary meaning, or names of prophets/righteous figures that have a connection.
-{{#if existingNames.length}}
+{{#if existingNames}}
 Do not suggest any of the following names that have already been provided:
 {{{JSON.stringify existingNames}}}
 {{/if}}
